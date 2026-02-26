@@ -162,6 +162,33 @@ input[readonly] {
   background: var(--warning);
 }
 
+.action-card {
+  border: 2px solid #bed7f0;
+}
+
+.sos-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.action-btn {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.action-sms {
+  background: #1d6f42;
+}
+
+.action-call {
+  background: #a40f2d;
+}
+
 .emergency-card {
   border: 1px solid #bfd4e2;
 }
@@ -235,5 +262,9 @@ input[readonly] {
     width: 100%;
     aspect-ratio: 1 / 1;
     font-size: 1.06rem;
+  }
+
+  .action-btn {
+    font-size: 1.15rem;
   }
 }

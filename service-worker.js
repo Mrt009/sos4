@@ -1,4 +1,4 @@
-const CACHE_NAME = "disaster-sos-offline-v3";
+const CACHE_NAME = "disaster-sos-offline-v4";
 const APP_ASSETS = [
   "./",
   "./index.html",

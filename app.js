@@ -33,12 +33,17 @@ const directDialBtn = document.getElementById("directDialBtn");
 const guardianCallBtn = document.getElementById("guardianCallBtn");
 const guardianSmsBtn = document.getElementById("guardianSmsBtn");
 const sendPendingBtn = document.getElementById("sendPendingBtn");
+const actionSmsBtn = document.getElementById("actionSmsBtn");
+const actionCallBtn = document.getElementById("actionCallBtn");
+const sosActionCard = document.getElementById("sosActionCard");
+const sosActionTitle = document.getElementById("sosActionTitle");
 const setupStatus = document.getElementById("setupStatus");
 const runtimeStatus = document.getElementById("runtimeStatus");
 const categoryButtons = document.querySelectorAll("[data-category]");
 
 let volatileLocation = loadLastLocation();
 let locationWatchId = null;
+let selectedSOS = null;
 
 boot();
 
@@ -49,14 +54,16 @@ function boot() {
   startLocationWatch();
 
   if (saveBtn) saveBtn.addEventListener("click", saveSettings);
-  if (panicBtn) panicBtn.addEventListener("click", () => startSOS("unknown"));
+  if (panicBtn) panicBtn.addEventListener("click", () => prepareSOS("unknown"));
   if (directDialBtn) directDialBtn.addEventListener("click", startDirectSOS);
   if (guardianCallBtn) guardianCallBtn.addEventListener("click", callGuardian);
   if (guardianSmsBtn) guardianSmsBtn.addEventListener("click", smsGuardian);
   if (sendPendingBtn) sendPendingBtn.addEventListener("click", sendPendingSOS);
+  if (actionSmsBtn) actionSmsBtn.addEventListener("click", handleSOSSms);
+  if (actionCallBtn) actionCallBtn.addEventListener("click", handleSOSCall);
 
   categoryButtons.forEach((btn) => {
-    btn.addEventListener("click", () => startSOS(btn.dataset.category || "unknown"));
+    btn.addEventListener("click", () => prepareSOS(btn.dataset.category || "unknown"));
   });
 
   window.addEventListener("online", () => {
@@ -320,7 +327,16 @@ function triggerCallAndSms(callNumber, smsNumber, smsBody) {
   }, 1200);
 }
 
-async function startSOS(category, directNumber) {
+function showSOSActionCard(category) {
+  if (sosActionCard) {
+    sosActionCard.hidden = false;
+  }
+  if (sosActionTitle) {
+    sosActionTitle.textContent = `Selected Category: ${String(category).toUpperCase()}`;
+  }
+}
+
+function prepareSOS(category, directNumber) {
   const config = loadSettings();
   const selectedCategory = category || "unknown";
   const overrideNumber = sanitizePhone(directNumber || "");
@@ -332,27 +348,48 @@ async function startSOS(category, directNumber) {
     return;
   }
 
-  setSetupStatus("Getting live GPS location...");
-  const location = await getBestLocation(12000);
-  const smsBody = buildSosMessage(selectedCategory, config, location);
-
-  savePendingSOS({
-    id: Date.now(),
+  selectedSOS = {
     category: selectedCategory,
     callNumber,
     smsNumber,
+    config
+  };
+
+  showSOSActionCard(selectedCategory);
+  setSetupStatus(`Category ${selectedCategory.toUpperCase()} selected. Choose Call or SMS + Live Location.`);
+}
+
+async function handleSOSSms() {
+  if (!selectedSOS) {
+    setSetupStatus("Select a category first.");
+    return;
+  }
+
+  setSetupStatus("Getting live GPS location...");
+  const location = await getBestLocation(12000);
+  const smsBody = buildSosMessage(selectedSOS.category, selectedSOS.config, location);
+
+  savePendingSOS({
+    id: Date.now(),
+    category: selectedSOS.category,
+    callNumber: selectedSOS.callNumber,
+    smsNumber: selectedSOS.smsNumber,
     message: smsBody,
     createdAt: new Date().toISOString()
   });
 
-  if (navigator.onLine) {
-    setSetupStatus("SOS ready. Opening call and SMS now.");
-  } else {
-    setSetupStatus("Offline mode. Opening call/SMS now. If failed, tap Send Pending SOS later.");
+  setSetupStatus(`Opening SMS to ${selectedSOS.smsNumber}.`);
+  openSms(selectedSOS.smsNumber, smsBody);
+}
+
+function handleSOSCall() {
+  if (!selectedSOS) {
+    setSetupStatus("Select a category first.");
+    return;
   }
 
-  setRuntimeStatus(`Dialing ${callNumber}. Then opening SMS to ${smsNumber}.`);
-  triggerCallAndSms(callNumber, smsNumber, smsBody);
+  setSetupStatus(`Dialing ${selectedSOS.callNumber}.`);
+  dialNumber(selectedSOS.callNumber);
 }
 
 function sendPendingSOS() {
@@ -372,7 +409,7 @@ function startDirectSOS() {
     setSetupStatus("Enter a direct emergency number first.");
     return;
   }
-  startSOS("direct", directNumber);
+  prepareSOS("direct", directNumber);
 }
 
 function callGuardian() {
