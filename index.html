@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d3b66" />
+    <title>Disaster SOS Offline Demo</title>
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero card">
+        <img src="./icon.svg" alt="Emergency SOS" class="hero-icon" />
+        <div>
+          <h1>Emergency SOS (Offline Ready)</h1>
+          <p>
+            Category buttons are at top for fastest tap. Works offline after first load.
+          </p>
+        </div>
+      </header>
+
+      <section class="card sos-top-card">
+        <h2>SOS Category (Tap First)</h2>
+        <div class="sos-category-grid">
+          <button id="panicBtn" class="btn panic cat-btn">PANIC / UNKNOWN</button>
+          <button class="btn danger cat-btn" data-category="fire">FIRE</button>
+          <button class="btn danger cat-btn" data-category="flood">FLOOD</button>
+          <button class="btn danger cat-btn" data-category="earthquake">EARTHQUAKE</button>
+          <button class="btn danger cat-btn" data-category="medical">MEDICAL</button>
+        </div>
+
+      </section>
+
+      <section class="card emergency-card">
+        <h2>Quick Emergency Actions</h2>
+
+        <div class="quick-grid">
+          <label class="inline-control">
+            Direct Emergency Number
+            <input id="quickDialInput" type="tel" placeholder="+91 8700523035" />
+          </label>
+          <button id="directDialBtn" class="btn quick">Call + SMS Direct Number</button>
+          <button id="guardianCallBtn" class="btn guardian">Call Guardian</button>
+          <button id="guardianSmsBtn" class="btn guardian-secondary">SMS Guardian</button>
+          <button id="sendPendingBtn" class="btn pending">Send Pending SOS</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Setup (Save Once)</h2>
+        <p class="muted">
+          Name is optional. Location permission is requested automatically on load.
+          Fire, Flood, Earthquake, and Medical numbers are locked.
+        </p>
+
+        <div class="grid">
+          <label>
+            Name (Optional)
+            <input id="nameInput" type="text" placeholder="Asha" />
+          </label>
+
+          <label>
+            Guardian Call Number
+            <input id="guardianCallInput" type="tel" placeholder="+91 9000000000" />
+          </label>
+
+          <label>
+            Guardian SMS Number
+            <input id="guardianSmsInput" type="tel" placeholder="+91 9000000000" />
+          </label>
+
+          <label>
+            Fire Number
+            <input id="fireInput" type="tel" placeholder="101" readonly />
+          </label>
+
+          <label>
+            Flood Number
+            <input id="floodInput" type="tel" placeholder="108" readonly />
+          </label>
+
+          <label>
+            Earthquake Number
+            <input id="earthquakeInput" type="tel" placeholder="112" readonly />
+          </label>
+
+          <label>
+            Medical Number
+            <input id="medicalInput" type="tel" placeholder="108" readonly />
+          </label>
+
+          <label>
+            Unknown / Panic Number
+            <input id="unknownInput" type="tel" placeholder="+91 8700523035" />
+          </label>
+
+          <label>
+            Default SMS Number
+            <input id="smsInput" type="tel" placeholder="+91 8700523035" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="saveBtn" class="btn">Save Offline Settings</button>
+        </div>
+        <p id="setupStatus" class="status"></p>
+      </section>
+
+      <section class="card small">
+        <h2>Important</h2>
+        <ul>
+          <li>First install/open needs internet once.</li>
+          <li>After install, app UI runs offline.</li>
+          <li>If SMS cannot send immediately, phone outbox retries once network returns.</li>
+        </ul>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
